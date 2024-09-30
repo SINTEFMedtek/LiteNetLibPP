@@ -71,14 +71,15 @@ namespace lnl {
 
     private:
         void ensure(size_t size) {
-            if (m_data.size() > size) {
+            size_t neededSize = size + m_position;
+            if (m_data.size() > neededSize) {
                 return;
             }
 
             do {
                 auto newSize = m_data.empty() ? 1 : m_data.size();
                 m_data.resize(newSize * GROWTH_FACTOR, 0);
-            } while (m_data.size() <= size);
+            } while (m_data.size() <= neededSize);
         }
     };
 }
