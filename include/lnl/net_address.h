@@ -6,7 +6,7 @@
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -88,7 +88,7 @@ namespace lnl {
             return other.raw.sin_addr.S_un.S_addr == raw.sin_addr.S_un.S_addr &&
                    other.raw.sin_port == raw.sin_port &&
                    other.raw.sin_family == raw.sin_family;
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
             return other.raw.sin_addr.s_addr == raw.sin_addr.s_addr &&
                    other.raw.sin_port == raw.sin_port &&
                    other.raw.sin_family == raw.sin_family;
@@ -115,7 +115,7 @@ namespace lnl {
         size_t operator()(const net_address& key) const {
 #ifdef WIN32
             return (uint64_t) key.raw.sin_addr.S_un.S_addr << 32 | key.raw.sin_port; //simply join ip and port
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
             return (uint64_t) key.raw.sin_addr.s_addr << 32 | key.raw.sin_port; //simply join ip and port
 #endif
         }

@@ -9,7 +9,7 @@
 
 #include <Winsock2.h>
 
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
 
 #include <sys/socket.h>
 
@@ -64,7 +64,7 @@ namespace lnl {
     public:
 #ifdef WIN32
         bool reuse_address = false;
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
         int32_t reuse_address = false;
 #endif
         size_t packet_pool_size = 1000;

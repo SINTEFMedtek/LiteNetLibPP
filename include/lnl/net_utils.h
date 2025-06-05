@@ -9,7 +9,7 @@
 
 #include <Windows.h>
 
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
 
 #include <sys/time.h>
 

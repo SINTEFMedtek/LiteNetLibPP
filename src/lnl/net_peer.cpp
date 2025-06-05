@@ -291,7 +291,7 @@ lnl::net_base_channel* lnl::net_peer::create_channel(uint8_t idx) {
 #ifdef WIN32
     auto prevChannel = (net_base_channel*) InterlockedCompareExchangePointer((void**) &m_channels[idx], newChannel,
                                                                              nullptr);
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
     auto prevChannel = (net_base_channel*) __sync_val_compare_and_swap((void**) &m_channels[idx], nullptr,
                                                                        newChannel);
 #endif
@@ -740,7 +740,7 @@ void lnl::net_peer::send_internal(const uint8_t* data, size_t offset, size_t siz
 
 #ifdef WIN32
         auto currentFragmentId = (uint16_t) InterlockedIncrement((uint32_t*) &m_fragment_id);
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
         auto currentFragmentId = (uint16_t) __sync_add_and_fetch((uint32_t*) &m_fragment_id, 1);
 #endif
 

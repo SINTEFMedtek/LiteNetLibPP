@@ -9,7 +9,7 @@
 
 #define GET_SOCK_ERROR WSAGetLastError
 #define IOCTL ioctlsocket
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
 
 #include <cerrno>
 #include <sys/ioctl.h>
@@ -70,7 +70,7 @@ bool lnl::net_manager::start(uint16_t port) {
     addr.sin_family = AF_INET;
 #ifdef WIN32
     addr.sin_addr.S_un.S_addr = INADDR_ANY;
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
     addr.sin_addr.s_addr = INADDR_ANY;
 #endif
     return start(addr);
@@ -112,7 +112,7 @@ bool lnl::net_manager::start(const sockaddr_in& addr) {
 bool lnl::net_manager::bind_socket(const sockaddr_in& addr) {
 #ifdef WIN32
     DWORD timeout = 500;
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
     struct timeval timeout{.tv_sec = 0, .tv_usec = 500000};
 #endif
 
@@ -174,12 +174,12 @@ bool lnl::net_manager::bind_socket(const sockaddr_in& addr) {
         return false;
     }
 
-#ifdef __APPLE__
-    if (!set_socket_option(IPPROTO_IP, IP_DONTFRAGMENT, true)) {
-        m_logger.log("Cannot set IP_DONTFRAGMENT");
-        return false;
-    }
-#endif
+// #ifdef __APPLE__
+//     if (!set_socket_option(IPPROTO_IP, IP_DONTFRAGMENT, true)) {
+//         m_logger.log("Cannot set IP_DONTFRAGMENT");
+//         return false;
+//     }
+// #endif
 
     if (bind(m_socket, (sockaddr*) &addr, sizeof addr) == SOCKET_ERROR) {
         m_logger.log("Bind failed: %p", GET_SOCK_ERROR());
@@ -531,7 +531,7 @@ int32_t lnl::net_manager::send_raw(const uint8_t* data, size_t offset, size_t le
 #ifdef WIN32
             case WSAEHOSTUNREACH:
             case WSAENETUNREACH: {
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
             case EHOSTUNREACH:
             case ENETUNREACH: {
 #endif
@@ -542,7 +542,7 @@ int32_t lnl::net_manager::send_raw(const uint8_t* data, size_t offset, size_t le
                         disconnect_peer_force(endpoint,
 #ifdef WIN32
                                 errorCode == WSAEHOSTUNREACH
-#elif __linux__
+#elif defined(__linux__) || defined(__APPLE__)
                                               errorCode == EHOSTUNREACH
                                               #endif
                                               ? DISCONNECT_REASON::HOST_UNREACHABLE
